@@ -37,4 +37,6 @@ public interface UserMapper {
 
     @Select("select * from user where username = #{username}")
     User selectByUsername(String username);
+
+    List<User> selectUnassignedTeachers();
 }

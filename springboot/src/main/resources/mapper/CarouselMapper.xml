@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.mapper.CarouselMapper">
+
+    <resultMap id="BaseResultMap" type="com.example.entity.Carousel">
+        <id property="id" column="id" jdbcType="INTEGER"/>
+        <result property="img" column="img" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,img
+    </sql>
+
+    <select id="selectAll" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List" />
+        from carousel
+        <where>
+            <if test="id != null"> and id = #{id}</if>
+            <if test="img != null"> and img = #{img}</if>
+        </where>
+        order by id desc
+    </select>
+
+    <select id="selectById" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List" />
+        from carousel
+        where id = #{id}
+    </select>
+
+    <delete id="deleteById" parameterType="java.lang.Integer">
+        delete from carousel
+        where id = #{id}
+    </delete>
+
+    <insert id="insert" parameterType="com.example.entity.Carousel" useGeneratedKeys="true">
+        insert into carousel
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">id,</if>
+            <if test="img != null">img,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">#{id},</if>
+            <if test="img != null">#{img},</if>
+        </trim>
+    </insert>
+
+    <update id="updateById" parameterType="com.example.entity.Carousel">
+        update carousel
+        <set>
+            <if test="img != null">
+                img = #{img},
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+</mapper>

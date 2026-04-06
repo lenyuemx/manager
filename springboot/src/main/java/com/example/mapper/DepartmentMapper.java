@@ -35,6 +35,11 @@ public interface DepartmentMapper {
     */
     List<Department> selectAll(Department department);
 
+    List<Department> selectHot();
+
     @Select("select * from department where user_id = #{userId} ")
     Department selectByUserId(Integer userId);
+
+    @Select("select * from department where teacher_id = #{teacherId} limit 1")
+    Department selectByTeacherId(Integer teacherId);
 }

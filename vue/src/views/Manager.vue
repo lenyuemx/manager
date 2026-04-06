@@ -2,7 +2,7 @@
 <template>
   <div class="manager-container">
     <!--  头部  -->
-    <div class="manager-header">
+    <div class="manager-header glass-effect">
       <div class="manager-header-left">
         <img src="@/assets/imgs/logo.png" />
         <div class="title">后台管理系统</div>
@@ -33,36 +33,50 @@
     <!--  主体  -->
     <div class="manager-main">
       <!--  侧边栏  -->
-      <div class="manager-main-left">
-        <el-menu :default-openeds="['info','days','user']" router style="border: none" :default-active="$route.path">
+      <div class="manager-main-left rounded">
+        <el-menu :default-openeds="['info','days','user','teacher']" router style="border: none" :default-active="$route.path">
           <el-menu-item index="/home">
             <i class="el-icon-s-home"></i>
             <span slot="title">系统首页</span>
           </el-menu-item>
-          <el-submenu index="info">
+          <el-submenu index="info" v-if="user.role !== 'TEACHER'">
             <template slot="title">
               <i class="el-icon-menu"></i><span>信息管理</span>
             </template>
-            <el-menu-item index="/notice">公告信息</el-menu-item>
+            <el-menu-item index="/notice" v-if="user.role === 'ADMIN'">公告信息</el-menu-item>
+            <el-menu-item index="/carousel" v-if="user.role === 'ADMIN'">轮播图管理</el-menu-item>
             <el-menu-item index="/department">社团信息</el-menu-item>
           </el-submenu>
 
-          <el-submenu index="days">
+          <el-submenu index="days" v-if="user.role !== 'TEACHER'">
             <template slot="title">
               <i class="el-icon-menu"></i><span>日常管理</span>
             </template>
             <el-menu-item index="/apply">申请审批</el-menu-item>
+            <el-menu-item index="/adminNewDepartmentApply" v-if="user.role === 'ADMIN'">新社团审批</el-menu-item>
             <el-menu-item index="/member">社团成员</el-menu-item>
+            <el-menu-item index="/quitApply">退团申请</el-menu-item>
             <el-menu-item index="/activity">社团活动</el-menu-item>
             <el-menu-item index="/information">社团资讯</el-menu-item>
+            <el-menu-item index="/comment">评论管理</el-menu-item>
           </el-submenu>
 
-          <el-submenu index="user">
+          <el-submenu index="user" v-if="user.role === 'ADMIN'">
             <template slot="title">
               <i class="el-icon-menu"></i><span>用户管理</span>
             </template>
             <el-menu-item index="/admin">管理员信息</el-menu-item>
             <el-menu-item index="/user">用户信息</el-menu-item>
+          </el-submenu>
+
+          <el-submenu index="teacher" v-if="user.role === 'TEACHER'">
+            <template slot="title">
+              <i class="el-icon-menu"></i><span>社团管理</span>
+            </template>
+            <el-menu-item index="/newDepartmentApply">新建社团审批</el-menu-item>
+            <el-menu-item index="/teacherActivityApply">活动审批</el-menu-item>
+            <el-menu-item index="/teacherInformationApply">资讯审批</el-menu-item>
+            <el-menu-item index="/comment">评论管理</el-menu-item>
           </el-submenu>
         </el-menu>
       </div>
@@ -100,6 +114,9 @@ export default {
       if (this.user.role === 'USER'){
         this.$router.push('/userPerson')
       }
+      if (this.user.role === 'TEACHER') {
+        this.$router.push('/teacherPerson')
+      }
     },
     logout() {
       localStorage.removeItem('xm-user')
@@ -111,4 +128,15 @@ export default {
 
 <style scoped>
 @import "@/assets/css/manager.css";
+
+.glass-effect {
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.1));
+  backdrop-filter: blur(10px);
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.rounded {
+  border-radius: 10px;
+}
 </style>

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.mapper.LikesMapper">
+
+    <insert id="insert" parameterType="com.example.entity.Likes" useGeneratedKeys="true" keyProperty="id">
+        insert into likes
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="userId != null">user_id,</if>
+            <if test="foreignId != null">foreign_id,</if>
+            <if test="module != null">module,</if>
+            <if test="time != null">time,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="userId != null">#{userId},</if>
+            <if test="foreignId != null">#{foreignId},</if>
+            <if test="module != null">#{module},</if>
+            <if test="time != null">#{time},</if>
+        </trim>
+    </insert>
+
+    <delete id="deleteById">
+        delete from likes where id = #{id}
+    </delete>
+
+    <select id="selectUserLike" resultType="com.example.entity.Likes">
+        select * from likes
+        where user_id = #{userId} and foreign_id = #{foreignId} and module = #{module}
+    </select>
+
+    <select id="selectCountByForeignIdAndModule" resultType="java.lang.Integer">
+        select count(*) from likes
+        where foreign_id = #{foreignId} and module = #{module}
+    </select>
+
+</mapper>

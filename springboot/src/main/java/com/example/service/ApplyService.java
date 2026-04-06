@@ -38,6 +38,10 @@ public class ApplyService {
      * 新增
      */
     public void add(Apply apply) {
+        // 校验用户是否已经在社团中
+        if (checkIsInClub(apply.getUserId())) {
+            throw new CustomException(ResultCodeEnum.CLUB_ALREADY_ERROR);
+        }
         // 先去查询一下该学生有没有申请过该社团
         List<Apply> list = applyMapper.selectByStatus(apply.getUserId(), apply.getDepartmentId());
         if (CollectionUtil.isNotEmpty(list)) {
@@ -46,6 +50,23 @@ public class ApplyService {
         apply.setProcess(ApplyEnum.PROCESS_HEADER_APPLYING.status);
         apply.setStatus(ApplyEnum.STATUS_APPLYING.status);
         applyMapper.insert(apply);
+    }
+
+    /**
+     * 校验用户是否已经在社团中
+     */
+    public boolean checkIsInClub(Integer userId) {
+        // 1. 校验是否是社长
+        User user = userMapper.selectById(userId);
+        if (ObjectUtil.isNotEmpty(user) && LevelEnum.HEADER.level.equals(user.getLevel())) {
+            return true;
+        }
+        // 2. 校验是否有已通过的入团申请
+        Apply apply = new Apply();
+        apply.setUserId(userId);
+        apply.setStatus(ApplyEnum.STATUS_APPLY_OK.status);
+        List<Apply> list = applyMapper.selectAll(apply);
+        return ObjectUtil.isNotEmpty(list) && list.size() > 0;
     }
 
     /**
@@ -89,16 +110,7 @@ public class ApplyService {
      * 分页查询
      */
     public PageInfo<Apply> selectPage(Apply apply, Integer pageNum, Integer pageSize) {
-        Account currentUser = TokenUtils.getCurrentUser();
-        if (RoleEnum.USER.name().equals(currentUser.getRole())) {
-            User user = userMapper.selectById(currentUser.getId());
-            if (LevelEnum.HEADER.level.equals(user.getLevel())) {
-                Department department = departmentMapper.selectByUserId(user.getId());
-                if (ObjectUtil.isNotEmpty(department)) {
-                    apply.setDepartmentId(department.getId());
-                }
-            }
-        }
+        extracted(apply);
         PageHelper.startPage(pageNum, pageSize);
         List<Apply> list = applyMapper.selectAll(apply);
         return PageInfo.of(list);
@@ -120,7 +132,16 @@ public class ApplyService {
                 Department department = departmentMapper.selectByUserId(user.getId());
                 if (ObjectUtil.isNotEmpty(department)) {
                     apply.setDepartmentId(department.getId());
+                } else {
+                    apply.setDepartmentId(-1);
                 }
+            }
+        } else if (RoleEnum.TEACHER.name().equals(currentUser.getRole())) {
+            Department department = departmentMapper.selectByTeacherId(currentUser.getId());
+            if (ObjectUtil.isNotEmpty(department)) {
+                apply.setDepartmentId(department.getId());
+            } else {
+                apply.setDepartmentId(-1);
             }
         }
     }

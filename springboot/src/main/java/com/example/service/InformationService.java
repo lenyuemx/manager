@@ -3,24 +3,22 @@ package com.example.service;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.example.common.enums.RoleEnum;
-import com.example.entity.Account;
-import com.example.entity.Activity;
-import com.example.entity.Department;
-import com.example.entity.Information;
-import com.example.mapper.ActivityMapper;
+import com.example.entity.*;
 import com.example.mapper.DepartmentMapper;
 import com.example.mapper.InformationMapper;
+
 import com.example.utils.TokenUtils;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.Date;
 import java.util.List;
 
 /**
- * 社团活动业务处理
+ * 社团资讯业务处理
  **/
 @Service
 public class InformationService {
@@ -30,6 +28,7 @@ public class InformationService {
     @Resource
     private DepartmentMapper departmentMapper;
 
+
     /**
      * 新增
      */
@@ -38,7 +37,14 @@ public class InformationService {
         // 获取社团ID
         Account currentUser = TokenUtils.getCurrentUser();
         Department department = departmentMapper.selectByUserId(currentUser.getId());
-        information.setDepartmentId(department.getId());
+        if (ObjectUtil.isNotEmpty(department)) {
+            information.setDepartmentId(department.getId());
+        }
+        if (RoleEnum.USER.name().equals(currentUser.getRole())) {
+            information.setStatus("待审核");
+        } else {
+            information.setStatus("通过");
+        }
         informationMapper.insert(information);
     }
 
@@ -68,8 +74,13 @@ public class InformationService {
     /**
      * 根据ID查询
      */
+    @Transactional
     public Information selectById(Integer id) {
         Information information = informationMapper.selectById(id);
+        // 增加浏览量
+        information.setViews(information.getViews() == null ? 1 : information.getViews() + 1);
+        informationMapper.updateById(information);
+
         Department department = departmentMapper.selectById(information.getDepartmentId());
         if (ObjectUtil.isNotEmpty(department)) {
             information.setDepartmentName(department.getName());
@@ -81,17 +92,11 @@ public class InformationService {
      * 查询所有
      */
     public List<Information> selectAll(Information information) {
-        List<Information> activities = informationMapper.selectAll(information);
-        for (Information dbInformation : activities) {
+        List<Information> informations = informationMapper.selectAll(information);
+        for (Information dbInformation : informations) {
             dbInformation.setDescription(dbInformation.getDescription().replaceAll("<p>", "").replaceAll("</p>", ""));
         }
-        return activities;
-    }
-
-    public PageInfo<Information> selectPage2(Information information, Integer pageNum, Integer pageSize) {
-        PageHelper.startPage(pageNum, pageSize);
-        List<Information> list = selectAll(information);
-        return PageInfo.of(list);
+        return informations;
     }
 
     /**
@@ -105,9 +110,14 @@ public class InformationService {
                 information.setDepartmentId(department.getId());
             }
         }
+        if (RoleEnum.TEACHER.name().equals(currentUser.getRole())) {
+            Department department = departmentMapper.selectByTeacherId(currentUser.getId());
+            if (ObjectUtil.isNotEmpty(department)) {
+                information.setDepartmentId(department.getId());
+            }
+        }
         PageHelper.startPage(pageNum, pageSize);
         List<Information> list = informationMapper.selectAll(information);
         return PageInfo.of(list);
     }
-
 }

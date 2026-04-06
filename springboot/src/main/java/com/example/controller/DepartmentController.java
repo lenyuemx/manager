@@ -73,6 +73,12 @@ public class DepartmentController {
         return Result.success(list);
     }
 
+    @GetMapping("/selectHot")
+    public Result selectHot() {
+        List<Department> list = departmentService.selectHot();
+        return Result.success(list);
+    }
+
     /**
      * 分页查询
      */

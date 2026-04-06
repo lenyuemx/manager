@@ -16,6 +16,8 @@ public enum ResultCodeEnum {
     PARAM_PASSWORD_ERROR("5005", "原密码输入错误"),
     HEADER_ALREADY_ERROR("5006", "该用户已经担任其他社团社长"),
     APPLY_ALREADY_ERROR("5007", "您已经申请过该社团"),
+    QUIT_APPLY_ALREADY_ERROR("5008", "你已提交退团申请，请勿重复提交"),
+    CLUB_ALREADY_ERROR("5009", "你已经在一个社团里了"),
     ;
 
     public String code;

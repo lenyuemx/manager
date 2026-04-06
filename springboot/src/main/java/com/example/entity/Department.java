@@ -17,8 +17,11 @@ public class Department implements Serializable {
     private String description;
     /** 社长id*/
     private Integer userId;
+    /** 指导老师id*/
+    private Integer teacherId;
 
     private String userName;
+    private String teacherName;
     private String time;
 
     public Integer getId() {
@@ -75,5 +78,21 @@ public class Department implements Serializable {
 
     public void setTime(String time) {
         this.time = time;
+    }
+
+    public Integer getTeacherId() {
+        return teacherId;
+    }
+
+    public void setTeacherId(Integer teacherId) {
+        this.teacherId = teacherId;
+    }
+
+    public String getTeacherName() {
+        return teacherName;
+    }
+
+    public void setTeacherName(String teacherName) {
+        this.teacherName = teacherName;
     }
 }

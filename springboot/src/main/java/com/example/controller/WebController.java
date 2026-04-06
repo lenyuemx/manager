@@ -44,6 +44,10 @@ public class WebController {
         if (RoleEnum.USER.name().equals(account.getRole())){
             account = userService.login(account);
         }
+        /** 教师身份 */
+        if (RoleEnum.TEACHER.name().equals(account.getRole())) {
+            account = userService.loginTeacher(account);
+        }
         return Result.success(account);
     }
 
@@ -71,6 +75,9 @@ public class WebController {
             adminService.updatePassword(account);
         }
         if (RoleEnum.USER.name().equals(account.getRole())) {
+            userService.updatePassword(account);
+        }
+        if (RoleEnum.TEACHER.name().equals(account.getRole())) {
             userService.updatePassword(account);
         }
         return Result.success();

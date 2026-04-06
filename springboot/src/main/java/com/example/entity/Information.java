@@ -13,6 +13,9 @@ public class Information implements Serializable {
     private String description;
     private Integer departmentId;
     private String time;
+    private Integer views;
+    private Integer likes;
+    private String status;
 
     private String departmentName;
 
@@ -62,5 +65,29 @@ public class Information implements Serializable {
 
     public void setDepartmentName(String departmentName) {
         this.departmentName = departmentName;
+    }
+
+    public Integer getViews() {
+        return views;
+    }
+
+    public void setViews(Integer views) {
+        this.views = views;
+    }
+
+    public Integer getLikes() {
+        return likes;
+    }
+
+    public void setLikes(Integer likes) {
+        this.likes = likes;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 }

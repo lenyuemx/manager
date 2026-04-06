@@ -45,7 +45,11 @@ public class UserService {
         if (ObjectUtil.isEmpty(user.getName())) {
             user.setName(user.getUsername());
         }
-        user.setRole(RoleEnum.USER.name());
+        if ("教师".equals(user.getLevel())) {
+            user.setRole(RoleEnum.TEACHER.name());
+        } else {
+            user.setRole(RoleEnum.USER.name());
+        }
         userMapper.insert(user);
     }
 
@@ -69,6 +73,11 @@ public class UserService {
      * 修改
      */
     public void updateById(User user) {
+        if ("教师".equals(user.getLevel())) {
+            user.setRole(RoleEnum.TEACHER.name());
+        } else {
+            user.setRole(RoleEnum.USER.name());
+        }
         userMapper.updateById(user);
     }
 
@@ -93,13 +102,12 @@ public class UserService {
         PageHelper.startPage(pageNum, pageSize);
         List<User> list = userMapper.selectAll(user);
         for (User dbUser : list) {
-            if(ObjectUtil.isNotEmpty(dbUser.getLevel()) && LevelEnum.HEADER.level.equals(dbUser.getLevel())){
-                Department department = departmentMapper.selectByUserId(dbUser.getId());
-                if(ObjectUtil.isNotEmpty(department)){
+            if (dbUser.getDepartmentId() != null) {
+                Department department = departmentMapper.selectById(dbUser.getDepartmentId());
+                if (ObjectUtil.isNotEmpty(department)) {
                     dbUser.setDepartmentName(department.getName());
                 }
             }
-
         }
         return PageInfo.of(list);
     }
@@ -109,7 +117,7 @@ public class UserService {
      */
     public Account login(Account account) {
         Account dbUser = userMapper.selectByUsername(account.getUsername());
-        if (ObjectUtil.isNull(dbUser)) {
+        if (ObjectUtil.isNull(dbUser) || !RoleEnum.USER.name().equals(dbUser.getRole())) {
             throw new CustomException(ResultCodeEnum.USER_NOT_EXIST_ERROR);
         }
         if (!account.getPassword().equals(dbUser.getPassword())) {
@@ -137,7 +145,7 @@ public class UserService {
      */
     public void updatePassword(Account account) {
         User dbUser = userMapper.selectByUsername(account.getUsername());
-        if (ObjectUtil.isNull(dbUser)) {
+        if (ObjectUtil.isNull(dbUser) || !RoleEnum.TEACHER.name().equals(dbUser.getRole())) {
             throw new CustomException(ResultCodeEnum.USER_NOT_EXIST_ERROR);
         }
         if (!account.getPassword().equals(dbUser.getPassword())) {
@@ -150,5 +158,28 @@ public class UserService {
     public List<User> getAllHeaders(User user){
         user.setLevel(LevelEnum.HEADER.level);
         return userMapper.selectAll(user);
+    }
+
+    public List<User> selectUnassignedTeachers() {
+        return userMapper.selectUnassignedTeachers();
+    }
+
+    /**
+     * 教师登录（从user表中查找level='教师'的用户）
+     */
+    public Account loginTeacher(Account account) {
+        Account dbUser = userMapper.selectByUsername(account.getUsername());
+        if (ObjectUtil.isNull(dbUser) || !RoleEnum.TEACHER.name().equals(dbUser.getRole())) {
+            throw new CustomException(ResultCodeEnum.USER_NOT_EXIST_ERROR);
+        }
+        if (!account.getPassword().equals(dbUser.getPassword())) {
+            throw new CustomException(ResultCodeEnum.USER_ACCOUNT_ERROR);
+        }
+        // 生成token，角色标记为TEACHER
+        String tokenData = dbUser.getId() + "-" + RoleEnum.TEACHER.name();
+        String token = TokenUtils.createToken(tokenData, dbUser.getPassword());
+        dbUser.setToken(token);
+        dbUser.setRole(RoleEnum.TEACHER.name());
+        return dbUser;
     }
 }

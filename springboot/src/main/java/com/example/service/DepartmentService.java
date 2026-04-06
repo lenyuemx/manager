@@ -100,6 +100,10 @@ public class DepartmentService {
         return departmentMapper.selectAll(department);
     }
 
+    public List<Department> selectHot() {
+        return departmentMapper.selectHot();
+    }
+
     /**
      * 分页查询
      */

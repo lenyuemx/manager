@@ -29,6 +29,9 @@ pagehelper:
   params: count=countSql
 
 ip: localhost
+deepseek:
+  apiKey: sk-9ad3ea9f81fd46a6ad297a89cff3cb18
+  apiUrl: https://api.deepseek.com/chat/completions
 
 logging:
   level:

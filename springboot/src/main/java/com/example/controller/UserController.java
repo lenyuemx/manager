@@ -89,4 +89,10 @@ public class UserController {
         return Result.success(page);
     }
 
+    @GetMapping("/selectUnassignedTeachers")
+    public Result selectUnassignedTeachers() {
+        List<User> list = userService.selectUnassignedTeachers();
+        return Result.success(list);
+    }
+
 }

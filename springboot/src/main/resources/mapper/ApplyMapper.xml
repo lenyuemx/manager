@@ -17,10 +17,10 @@
             <if test="id != null"> and apply.id = #{id}</if>
             <if test="userId != null"> and apply.user_id = #{userId}</if>
             <if test="departmentId != null"> and apply.department_id = #{departmentId}</if>
-            <if test="description != null"> and apply.description = #{description}</if>
-            <if test="process != null"> and apply.process = #{process}</if>
-            <if test="status != null"> and apply.status = #{status}</if>
-            <if test="note != null"> and apply.note = #{note}</if>
+            <if test="description != null and description != ''"> and apply.description = #{description}</if>
+            <if test="process != null and process != ''"> and apply.process = #{process}</if>
+            <if test="status != null and status != ''"> and apply.status = #{status}</if>
+            <if test="note != null and note != ''"> and apply.note = #{note}</if>
         </where>
         order by apply.id desc
     </select>

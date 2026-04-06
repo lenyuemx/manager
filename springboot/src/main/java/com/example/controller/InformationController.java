@@ -86,12 +86,4 @@ public class InformationController {
         return Result.success(page);
     }
 
-    @GetMapping("/selectPage2")
-    public Result selectPage2(Information information,
-                              @RequestParam(defaultValue = "1") Integer pageNum,
-                              @RequestParam(defaultValue = "10") Integer pageSize) {
-        PageInfo<Information> page = informationService.selectPage2(information, pageNum, pageSize);
-        return Result.success(page);
-    }
-
 }

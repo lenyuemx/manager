@@ -96,4 +96,10 @@
         where id = #{id} 
     </update>
 
+    <select id="selectUnassignedTeachers" resultType="com.example.entity.User">
+        select *
+        from user
+        where role = 'TEACHER' and id not in (select teacher_id from department where teacher_id is not null)
+    </select>
+
 </mapper>

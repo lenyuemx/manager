@@ -4,11 +4,23 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.example.mapper.InformationMapper">
 
+    <resultMap id="BaseResultMap" type="com.example.entity.Information">
+        <id property="id" column="id" jdbcType="INTEGER"/>
+        <result property="name" column="name" jdbcType="VARCHAR"/>
+        <result property="description" column="description" jdbcType="VARCHAR"/>
+        <result property="departmentId" column="department_id" jdbcType="INTEGER"/>
+        <result property="time" column="time" jdbcType="VARCHAR"/>
+        <result property="views" column="views" jdbcType="INTEGER"/>
+        <result property="likes" column="likes" jdbcType="INTEGER"/>
+        <result property="status" column="status" jdbcType="VARCHAR"/>
+        <result property="departmentName" column="departmentName" jdbcType="VARCHAR"/>
+    </resultMap>
+
     <sql id="Base_Column_List">
-        id,name,description,department_id,time
+        id,name,description,department_id,time,views,likes,status
     </sql>
 
-    <select id="selectAll" resultType="com.example.entity.Information">
+    <select id="selectAll" resultMap="BaseResultMap">
         select information.*, department.name as departmentName
         from information
         left join department on information.department_id = department.id
@@ -18,11 +30,12 @@
             <if test="description != null"> and description like concat('%', #{description}, '%')</if>
             <if test="departmentId != null"> and department_id= #{departmentId}</if>
             <if test="time != null"> and time= #{time}</if>
+            <if test="status != null"> and information.status = #{status}</if>
         </where>
         order by id desc
     </select>
 
-    <select id="selectById" resultType="com.example.entity.Information">
+    <select id="selectById" resultMap="BaseResultMap">
         select
         <include refid="Base_Column_List" />
         from information
@@ -42,6 +55,9 @@
             <if test="description != null">description,</if>
             <if test="departmentId != null">department_id,</if>
             <if test="time != null">time,</if>
+            <if test="views != null">views,</if>
+            <if test="likes != null">likes,</if>
+            <if test="status != null">status,</if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="id != null">#{id},</if>
@@ -49,6 +65,9 @@
             <if test="description != null">#{description},</if>
             <if test="departmentId != null">#{departmentId},</if>
             <if test="time != null">#{time},</if>
+            <if test="views != null">#{views},</if>
+            <if test="likes != null">#{likes},</if>
+            <if test="status != null">#{status},</if>
         </trim>
     </insert>
 
@@ -66,6 +85,15 @@
             </if>
             <if test="time != null">
                 time = #{time},
+            </if>
+            <if test="views != null">
+                views = #{views},
+            </if>
+            <if test="likes != null">
+                likes = #{likes},
+            </if>
+            <if test="status != null">
+                status = #{status},
             </if>
         </set>
         where id = #{id}

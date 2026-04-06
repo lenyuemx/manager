@@ -25,6 +25,12 @@ public class ApplyController {
         return Result.success();
     }
 
+    @GetMapping("/checkIsInClub/{userId}")
+    public Result checkIsInClub(@PathVariable Integer userId) {
+        boolean isInClub = applyService.checkIsInClub(userId);
+        return Result.success(isInClub);
+    }
+
     /**
      * 删除
      */

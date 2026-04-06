@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.mapper.CommentMapper">
+
+    <resultMap id="BaseResultMap" type="com.example.entity.Comment">
+        <id property="id" column="id" jdbcType="INTEGER"/>
+        <result property="content" column="content" jdbcType="VARCHAR"/>
+        <result property="userId" column="user_id" jdbcType="INTEGER"/>
+        <result property="time" column="time" jdbcType="VARCHAR"/>
+        <result property="parentId" column="parent_id" jdbcType="INTEGER"/>
+        <result property="likes" column="likes" jdbcType="INTEGER"/>
+        <result property="foreignId" column="foreign_id" jdbcType="INTEGER"/>
+        <result property="module" column="module" jdbcType="VARCHAR"/>
+        <result property="userName" column="user_name" jdbcType="VARCHAR"/>
+        <result property="userAvatar" column="user_avatar" jdbcType="VARCHAR"/>
+        <result property="activityName" column="activityName" jdbcType="VARCHAR"/>
+        <result property="informationName" column="informationName" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id, content, user_id, time, parent_id, likes, foreign_id, module
+    </sql>
+
+    <select id="selectAll" resultMap="BaseResultMap">
+        select comment.*, u.name as user_name, u.avatar as user_avatar, a.name as activityName, i.name as informationName
+        from comment
+        left join user u on comment.user_id = u.id
+        left join activity a on comment.module = 'activity' and comment.foreign_id = a.id
+        left join information i on comment.module = 'information' and comment.foreign_id = i.id
+        <if test="teacherId != null or departmentUserId != null">
+            left join department da on a.department_id = da.id
+            left join department di on i.department_id = di.id
+        </if>
+        <where>
+            <if test="id != null"> and comment.id = #{id}</if>
+            <if test="content != null"> and comment.content like concat('%', #{content}, '%')</if>
+            <if test="userId != null"> and comment.user_id = #{userId}</if>
+            <if test="parentId != null"> and comment.parent_id = #{parentId}</if>
+            <if test="foreignId != null"> and comment.foreign_id = #{foreignId}</if>
+            <if test="module != null"> and comment.module = #{module}</if>
+            <if test="teacherId != null"> 
+                and ((comment.module = 'activity' and da.teacher_id = #{teacherId}) 
+                     or (comment.module = 'information' and di.teacher_id = #{teacherId}))
+            </if>
+            <if test="departmentUserId != null"> 
+                and ((comment.module = 'activity' and da.user_id = #{departmentUserId}) 
+                     or (comment.module = 'information' and di.user_id = #{departmentUserId}))
+            </if>
+        </where>
+        order by comment.id desc
+    </select>
+
+    <select id="selectById" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List" />
+        from comment
+        where id = #{id}
+    </select>
+
+    <select id="selectByForeignId" resultMap="BaseResultMap">
+        select comment.*, u.name as user_name, u.avatar as user_avatar from comment
+        left join user u on comment.user_id = u.id
+        where foreign_id = #{foreignId} and module = #{module}
+    </select>
+
+    <delete id="deleteById" parameterType="java.lang.Integer">
+        delete from comment
+        where id = #{id}
+    </delete>
+
+    <insert id="insert" parameterType="com.example.entity.Comment" useGeneratedKeys="true" keyProperty="id">
+        insert into comment
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">id,</if>
+            <if test="content != null">content,</if>
+            <if test="userId != null">user_id,</if>
+            <if test="time != null">time,</if>
+            <if test="parentId != null">parent_id,</if>
+            <if test="likes != null">likes,</if>
+            <if test="foreignId != null">foreign_id,</if>
+            <if test="module != null">module,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">#{id},</if>
+            <if test="content != null">#{content},</if>
+            <if test="userId != null">#{userId},</if>
+            <if test="time != null">#{time},</if>
+            <if test="parentId != null">#{parentId},</if>
+            <if test="likes != null">#{likes},</if>
+            <if test="foreignId != null">#{foreignId},</if>
+            <if test="module != null">#{module},</if>
+        </trim>
+    </insert>
+
+    <update id="updateById" parameterType="com.example.entity.Comment">
+        update comment
+        <set>
+            <if test="content != null">
+                content = #{content},
+            </if>
+            <if test="userId != null">
+                user_id = #{userId},
+            </if>
+            <if test="time != null">
+                time = #{time},
+            </if>
+            <if test="parentId != null">
+                parent_id = #{parentId},
+            </if>
+            <if test="likes != null">
+                likes = #{likes},
+            </if>
+            <if test="foreignId != null">
+                foreign_id = #{foreignId},
+            </if>
+            <if test="module != null">
+                module = #{module},
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+</mapper>

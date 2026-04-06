@@ -86,12 +86,4 @@ public class ActivityController {
         return Result.success(page);
     }
 
-    @GetMapping("/selectPage2")
-    public Result selectPage2(Activity activity,
-                              @RequestParam(defaultValue = "1") Integer pageNum,
-                              @RequestParam(defaultValue = "10") Integer pageSize) {
-        PageInfo<Activity> page = activityService.selectPage2(activity, pageNum, pageSize);
-        return Result.success(page);
-    }
-
 }

@@ -70,6 +70,10 @@ public class TokenUtils {
                 if (RoleEnum.USER.name().equals(role)){
                     return staticUserService.selectById(Integer.valueOf(userId));
                 }
+                /** 判断教师角色（教师数据也在user表中） */
+                if (RoleEnum.TEACHER.name().equals(role)) {
+                    return staticUserService.selectById(Integer.valueOf(userId));
+                }
             }
         } catch (Exception e) {
             log.error("获取当前用户信息出错", e);
